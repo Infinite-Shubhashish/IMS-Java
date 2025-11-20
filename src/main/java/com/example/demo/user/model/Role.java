@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -16,6 +17,16 @@ public class Role {
 
     @Column(unique = true)
     private String roleName;
+
+//    @JsonIgnore
+//    private LocalDateTime createdDate;
+//    @JsonIgnore
+//    private LocalDateTime updatedDate;
+//
+//    public Role() {
+//        this.createdDate = LocalDateTime.now();
+//        this.updatedDate = LocalDateTime.now();
+//    }
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,16 @@ public class UserService {
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(roles);
-        
+
+//        user.setAccountExpired(false);
+//        user.setLocked(false);
+//        user.setEnabled(true);
+//        user.setCredentialsExpired(false);
+//
+//        user.setCreatedDate(LocalDateTime.now());
+//        user.setUpdatedDate(LocalDateTime.now());
+//        user.setLastLoginDate(LocalDateTime.now());
+
         userRepo.save(user);
     }
 

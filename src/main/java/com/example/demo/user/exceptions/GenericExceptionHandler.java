@@ -3,6 +3,7 @@ package com.example.demo.user.exceptions;
 
 import com.example.demo.user.utils.ApiResponseBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.crypto.BadPaddingException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GenericExceptionHandler {
@@ -58,6 +62,24 @@ public class GenericExceptionHandler {
                             .build()
             );
         }
+
+        @ExceptionHandler(ConstraintViolationException.class)
+        public ResponseEntity<Map<String, Object>> handleConstraintViolationException(ConstraintViolationException e) throws JsonProcessingException {
+
+            List<String> errors = e.getConstraintViolations()
+                        .stream()
+                        .map(err -> err.getPropertyPath() + " : " + err.getMessage())
+                        .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponseBuilder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .message("Validation Failed")
+                            .data(errors)
+                            .build()
+            );
+        }
+
 }
 
 
