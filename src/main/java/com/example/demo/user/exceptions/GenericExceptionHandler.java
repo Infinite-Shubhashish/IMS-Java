@@ -9,11 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.crypto.BadPaddingException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,8 +76,28 @@ public class GenericExceptionHandler {
                             .data(errors)
                             .build()
             );
+
         }
 
+            @ExceptionHandler(MethodArgumentNotValidException.class)
+            public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) throws JsonProcessingException {
+
+                List<String> errors =  e.getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(error -> error.getField() + " : " + error.getDefaultMessage())
+                        .toList();
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ApiResponseBuilder()
+                                .status(HttpStatus.BAD_REQUEST)
+                                .message("Validation Failed")
+                                .data(errors)
+                                .build()
+                );
+
+
+            }
 }
 
 
