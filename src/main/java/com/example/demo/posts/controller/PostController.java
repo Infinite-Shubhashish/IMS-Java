@@ -3,6 +3,8 @@ package com.example.demo.posts.controller;
 import com.example.demo.posts.DTOs.PostRequest;
 import com.example.demo.posts.DTOs.PostResponse;
 import com.example.demo.posts.DTOs.RejectRequest;
+import com.example.demo.posts.model.PostStatus;
+import com.example.demo.posts.model.PostType;
 import com.example.demo.posts.service.PostService;
 import com.example.demo.user.model.UserPrincipal;
 import com.example.demo.utils.ApiResponseBuilder;
@@ -134,7 +136,7 @@ public class PostController {
     }
 
     @PostMapping("/{id}/reject")
-     @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String,Object>> rejectPost(@PathVariable Long id, @RequestBody(required = false) RejectRequest request){
 
         String comment = (request != null) ? request.getAdminComment() : null;
@@ -149,4 +151,108 @@ public class PostController {
                 .build()
         );
     }
+
+    //Filter posts
+    @GetMapping("/me")
+    public ResponseEntity<Map<String,Object>> getMyPosts(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size,
+                                                         @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                         @AuthenticationPrincipal UserPrincipal user){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<PostResponse> postResponses = postService.getPostsByUsername(user.getUsername(), pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                .status(HttpStatus.OK)
+                .message("My posts fetched successfully")
+                .data(postResponses)
+                .build()
+        );
+    }    
+
+
+    //Filter posts by status
+    @GetMapping("/status")
+    public ResponseEntity<Map<String,Object>> getPostsByStatus(@RequestParam(name = "value") PostStatus status,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(defaultValue = "createdDate") String sortBy){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<PostResponse> postResponses = postService.getPostsByStatus(status, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                .status(HttpStatus.OK)
+                .message("Posts by status fetched successfully")
+                .data(postResponses)
+                .build()
+        );
+    }
+
+    //Filter posts by type
+    @GetMapping("/type")
+    public ResponseEntity<Map<String,Object>> getPostsByType(@RequestParam(name = "value") PostType type,
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(defaultValue = "createdDate") String sortBy){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<PostResponse> postResponses = postService.getPostsByType(type, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                .status(HttpStatus.OK)
+                .message("Posts by type fetched successfully")
+                .data(postResponses)
+                .build()
+        );
+    }
+
+    //Filter posts by username and status
+    @GetMapping("/me/status")
+    public ResponseEntity<Map<String,Object>> getMyPostsByStatus(@RequestParam(name="value") PostStatus status,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                @AuthenticationPrincipal UserPrincipal user)
+    {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<PostResponse> postResponse = postService.getPostsByUsernameAndStatus(user.getUsername(), status, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                .status(HttpStatus.OK)
+                .message("My posts filtered by status")
+                .data(postResponse)
+                .build()
+        );
+    }
+
+    @GetMapping("/me/type")
+    public ResponseEntity<Map<String,Object>> getMyPostsByType(@RequestParam(name = "value") PostType type,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                @AuthenticationPrincipal UserPrincipal user)
+    {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<PostResponse> postResponse = postService.getPostsByUsernameAndType(user.getUsername(), type, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                    .status(HttpStatus.OK)
+                    .message("My posts filtered by type")
+                    .data(postResponse)
+                    .build()
+        );
+    }
+
+
 }

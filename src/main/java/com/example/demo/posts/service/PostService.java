@@ -3,6 +3,7 @@ package com.example.demo.posts.service;
 import com.example.demo.posts.DTOs.PostRequest;
 import com.example.demo.posts.DTOs.PostResponse;
 import com.example.demo.posts.model.Post;
+import com.example.demo.posts.model.PostType;
 import com.example.demo.posts.repo.PostRepo;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repo.UserRepo;
@@ -47,6 +48,7 @@ public class PostService {
         return mapToResponse(saved);
 
     }
+
     //Update post
     public PostResponse updatePost(Long postId, PostRequest postRequest, String username) {
         User user = userRepo.findByUsername(username);
@@ -69,7 +71,7 @@ public class PostService {
         modelMapper.map(postRequest, post);
         return mapToResponse(post);
     }
-    
+
     //post for approval
     public PostResponse submitForApproval(Long postId, String username) {
         Post post = postRepo.findById(postId)
@@ -89,14 +91,14 @@ public class PostService {
     }
 
     //post by Id
-    public PostResponse getPost(Long id){
+    public PostResponse getPost(Long id) {
         Post post = postRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         return mapToResponse(post);
     }
 
     //pagination
-    public Page<PostResponse> getPosts(Pageable pageable){
+    public Page<PostResponse> getPosts(Pageable pageable) {
         return postRepo.findAll(pageable)
                 .map(this::mapToResponse);
     }
@@ -116,18 +118,19 @@ public class PostService {
         Post post = getPendingPost(postId);
         post.setStatus(PostStatus.REJECTED);
 
-        if (comment != null){
+        if (comment != null) {
             post.setAdminComment(comment);
         }
 
         return mapToResponse(post);
     }
+
     //close post
     public PostResponse adminClose(Long postId, String comment) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        if (comment != null){
+        if (comment != null) {
             post.setAdminComment(comment);
         }
         post.setStatus(PostStatus.CLOSED);
@@ -136,7 +139,7 @@ public class PostService {
 
     //find pending post
     private Post getPendingPost(Long postId) {
-        Post post  = postRepo.findById(postId)
+        Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         if (post.getStatus() != PostStatus.PENDING_APPROVAL) {
@@ -155,5 +158,37 @@ public class PostService {
         return postResponse;
     }
 
+    //filter posts
+    public Page<PostResponse> getPostsByUsername(String username, Pageable pageable) {
+        return postRepo.findByCreator_Username(username, pageable)
+                .map(this::mapToResponse);
+    }
 
+    //filter posts by status
+    public Page<PostResponse> getPostsByStatus(PostStatus status, Pageable pageable) {
+        return postRepo.findByStatus(status, pageable)
+                .map(this::mapToResponse);
+    }
+
+    //filter posts by type
+    public Page<PostResponse> getPostsByType(PostType type, Pageable pageable) {
+        return postRepo.findByType(type, pageable)
+                .map(this::mapToResponse);
+    }
+
+    //filter posts by username and status
+    public Page<PostResponse> getPostsByUsernameAndStatus(String username, PostStatus status,
+                                                          Pageable pageable) {
+        return postRepo.findByCreator_UsernameAndStatus(username, status, pageable)
+                .map(this::mapToResponse);
+    }
+
+    //filter posts by username and type
+    public Page<PostResponse> getPostsByUsernameAndType(String username, PostType type,
+                                                        Pageable pageable) {
+        return postRepo.findByCreator_UsernameAndType(username, type, pageable)
+                .map(this::mapToResponse);
+
+
+    }
 }
