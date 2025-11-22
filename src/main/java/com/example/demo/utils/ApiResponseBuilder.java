@@ -1,4 +1,4 @@
-package com.example.demo.user.utils;
+package com.example.demo.utils;
 
 import org.springframework.http.HttpStatus;
 
@@ -31,6 +31,5 @@ public class ApiResponseBuilder {
         map.put("timestamp", LocalDateTime.now());
         return map;
     }
-
 
 }

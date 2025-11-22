@@ -2,11 +2,10 @@ package com.example.demo.user.controller;
 
 import com.example.demo.user.model.User;
 import com.example.demo.user.service.UserService;
-import com.example.demo.user.utils.ApiResponseBuilder;
+import com.example.demo.utils.ApiResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

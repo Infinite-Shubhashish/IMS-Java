@@ -1,7 +1,7 @@
-package com.example.demo.user.exceptions;
+package com.example.demo.exceptions;
 
 
-import com.example.demo.user.utils.ApiResponseBuilder;
+import com.example.demo.utils.ApiResponseBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;

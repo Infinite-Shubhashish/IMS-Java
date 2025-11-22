@@ -2,7 +2,7 @@ package com.example.demo.user.controller;
 
 import com.example.demo.user.model.Role;
 import com.example.demo.user.service.RoleService;
-import com.example.demo.user.utils.ApiResponseBuilder;
+import com.example.demo.utils.ApiResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

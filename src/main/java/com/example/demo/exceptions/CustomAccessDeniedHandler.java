@@ -1,4 +1,4 @@
-package com.example.demo.user.exceptions;
+package com.example.demo.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

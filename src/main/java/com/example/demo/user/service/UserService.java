@@ -4,12 +4,14 @@ import com.example.demo.user.model.Role;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repo.RoleRepo;
 import com.example.demo.user.repo.UserRepo;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class UserService {
     @Autowired
     private RoleRepo roleRepo;
 
-    public void registerUser(@RequestBody User user) {
+    public void registerUser(@Valid @RequestBody User user) {
         List<Role> roles = new ArrayList<>();
 
         for(Role role : user.getRoles()){
@@ -42,16 +44,6 @@ public class UserService {
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(roles);
-
-//        user.setAccountExpired(false);
-//        user.setLocked(false);
-//        user.setEnabled(true);
-//        user.setCredentialsExpired(false);
-//
-//        user.setCreatedDate(LocalDateTime.now());
-//        user.setUpdatedDate(LocalDateTime.now());
-//        user.setLastLoginDate(LocalDateTime.now());
-
         userRepo.save(user);
     }
 

@@ -29,9 +29,7 @@ public class CustomUserDetailService implements UserDetailsService {
         }
 
         UserPrincipal principal = new UserPrincipal(user);
-
         logger.info("➡️ Logged in user: " + user.getUsername());
-
 
         return principal;
     }
