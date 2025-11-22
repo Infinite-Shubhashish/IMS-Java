@@ -3,6 +3,7 @@ package com.example.demo.Config;
 import com.example.demo.exceptions.CustomAccessDeniedHandler;
 import com.example.demo.exceptions.CustomAuthEntryPoint;
 import com.example.demo.user.service.CustomUserDetailService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +47,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
                         auth .requestMatchers("/auth/register","/auth/login").permitAll()
-                                .requestMatchers("/api/users","/api/roles").hasRole("ADMIN")
+                                .requestMatchers("/api/users","/api/roles","api/posts/*/approve","api/posts/*/reject","api/posts/*/close").hasRole("ADMIN")
+                                .requestMatchers("/api/posts","/api/posts/**").authenticated()
                                 .anyRequest().denyAll()
 
                 )
@@ -90,4 +92,10 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider(customUserDetailService))
                 .build();
     }
+
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
+    }
 }
+

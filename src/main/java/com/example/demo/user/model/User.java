@@ -1,4 +1,5 @@
 package com.example.demo.user.model;
+import com.example.demo.posts.model.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,6 +13,7 @@ import lombok.ToString;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,14 +62,31 @@ public class User {
     @JsonIgnore
     private LocalDateTime lastLoginDate;
 
-    public User(){
+//    public User(){
+//        this.createdDate = LocalDateTime.now();
+//        this.updatedDate = LocalDateTime.now();
+//        this.lastLoginDate = LocalDateTime.now();
+//        this.isAccountExpired = false;
+//        this.isLocked = false;
+//        this.isEnabled = false;
+//        this.isCredentialsExpired = false;
+//    }
+
+    @PrePersist
+    public void onCreate(){
         this.createdDate = LocalDateTime.now();
         this.updatedDate = LocalDateTime.now();
-        this.lastLoginDate = LocalDateTime.now();
+
         this.isAccountExpired = false;
         this.isLocked = false;
-        this.isEnabled = false;
+        this.isEnabled = true;
         this.isCredentialsExpired = false;
+
+    }
+
+    @PreUpdate
+    public void onUpdate(){
+        this.updatedDate = LocalDateTime.now();
     }
 
     @ToString.Exclude
@@ -79,6 +98,15 @@ public class User {
     )
     private List<Role> roles;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Post> posts = new ArrayList<>();
 
+//
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "assignee")
+//    @ToString.Exclude
+//    private List<Post> assignedPosts = new ArrayList<>();
 }
 

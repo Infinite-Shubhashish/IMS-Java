@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -36,6 +37,7 @@ public class RegisterController {
         @PostMapping(value="/login")
         public ResponseEntity<Map<String, Object>> login(@RequestBody User user) throws JsonProcessingException {
             userService.validateUser(user);
+
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ApiResponseBuilder()
                             .status(HttpStatus.OK)
@@ -43,7 +45,6 @@ public class RegisterController {
                             .build()
             );
         }
-
 
     }
 

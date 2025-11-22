@@ -32,7 +32,7 @@ public class UserService {
     @Autowired
     private RoleRepo roleRepo;
 
-    public void registerUser(@Valid @RequestBody User user) {
+    public void registerUser(@RequestBody User user) {
         List<Role> roles = new ArrayList<>();
 
         for(Role role : user.getRoles()){
@@ -53,5 +53,6 @@ public class UserService {
 
     public void validateUser(User user) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        user.setLastLoginDate(LocalDateTime.now());
     }
 }

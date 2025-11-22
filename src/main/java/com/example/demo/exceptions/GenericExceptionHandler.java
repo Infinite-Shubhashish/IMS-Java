@@ -3,10 +3,12 @@ package com.example.demo.exceptions;
 
 import com.example.demo.utils.ApiResponseBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -79,25 +81,56 @@ public class GenericExceptionHandler {
 
         }
 
-            @ExceptionHandler(MethodArgumentNotValidException.class)
-            public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) throws JsonProcessingException {
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) throws JsonProcessingException {
 
-                List<String> errors =  e.getBindingResult()
-                        .getFieldErrors()
-                        .stream()
-                        .map(error -> error.getField() + " : " + error.getDefaultMessage())
-                        .toList();
+        List<String> errors =  e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + " : " + error.getDefaultMessage())
+                .toList();
 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ApiResponseBuilder()
-                                .status(HttpStatus.BAD_REQUEST)
-                                .message("Validation Failed")
-                                .data(errors)
-                                .build()
-                );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponseBuilder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message("Validation Failed")
+                        .data(errors)
+                        .build()
+        );
 
 
-            }
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e) throws JsonProcessingException {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    new ApiResponseBuilder()
+                            .status(HttpStatus.FORBIDDEN)
+                            .message("Access Denied: " + e.getMessage())
+                            .build()
+            );
+        }
+
+        @ExceptionHandler(IllegalStateException.class)
+        public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException e) throws JsonProcessingException {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponseBuilder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .message("Illegal State: " + e.getMessage())
+                            .build()
+            );
+        }
+
+        @ExceptionHandler(EntityNotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException e) throws JsonProcessingException {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ApiResponseBuilder()
+                            .status(HttpStatus.NOT_FOUND)
+                            .message("Entity Not Found: " + e.getMessage())
+                            .build()
+            );
+        }
+        
 }
 
 
