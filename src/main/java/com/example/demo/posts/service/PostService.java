@@ -17,6 +17,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import com.example.demo.posts.model.PostStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Transactional
@@ -190,5 +195,62 @@ public class PostService {
                 .map(this::mapToResponse);
 
 
+    }
+
+    //countsByStatus
+    public Map<PostStatus, Long> getPostCountsByStatus(){
+        List<Map<String, Object>> counts = postRepo.countPostsByStatus();
+
+        Map<PostStatus, Long> result = new HashMap<>();
+
+        for (Map<String, Object> row : counts){
+            result.put((PostStatus) row.get("status"), (Long) row.get("count"));
+        }
+
+        return result;
+    }
+
+    //countsByType
+    public Map<PostType, Long> getPostCountsByType(){
+        List<Map<String, Object>> counts = postRepo.countPostsByType();
+        Map<PostType, Long> result = new HashMap<>();
+
+        for (Map<String, Object> row : counts){
+            result.put((PostType) row.get("type"), (Long) row.get("count"));
+        }
+
+        return result;
+    }
+
+   //countsByUsernameAndStatus
+    public Map<PostStatus, Long> getMyPostByStatus(String username){
+
+        List<Map<String, Object>> counts = postRepo.countMyPostsByStatus(username);
+        Map<PostStatus, Long> result = new HashMap<>();
+
+         for (Map<String, Object> row : counts){
+            result.put((PostStatus) row.get("status"), (Long) row.get("count"));
+        }
+        return result;
+    }
+
+    //countsByUsernameAndType
+    public Map<PostType, Long> getMyPostByType(String username){
+        List<Map<String, Object>> counts = postRepo.countMyPostsByType(username);
+        Map<PostType, Long> result = new HashMap<>();
+
+        for (Map<String, Object> row : counts) {
+            result.put((PostType) row.get("type"), (Long) row.get("count"));
+        }
+        return result;
+    }
+
+    //Total posts
+    public long getTotalPosts(){
+        return postRepo.count();
+    }
+
+    public long getMyTotalPosts(String username){
+        return postRepo.countByCreator_Username(username);
     }
 }
