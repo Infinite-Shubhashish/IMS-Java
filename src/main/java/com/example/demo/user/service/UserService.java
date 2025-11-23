@@ -5,6 +5,7 @@ import com.example.demo.user.model.User;
 import com.example.demo.user.repo.RoleRepo;
 import com.example.demo.user.repo.UserRepo;
 import jakarta.validation.Valid;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -53,6 +54,13 @@ public class UserService {
 
     public void validateUser(User user) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        user.setLastLoginDate(LocalDateTime.now());
+    }
+
+    public User getUserByUsername(@Length(min = 4, max = 40) String username) {
+        return userRepo.findByUsername(username);
+    }
+
+    public void updateLastLoginDate(String username){
+        userRepo.updateLastLogin(username, LocalDateTime.now());
     }
 }

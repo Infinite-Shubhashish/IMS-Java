@@ -20,10 +20,6 @@ public class UserController {
 
 
     @GetMapping(value = "/users")
-    public List<User> getUsers(){
-        return userService.getAllUsers();
-    }
-
     public ResponseEntity<Map<String,Object>> getAllUsers(){
         List<User> users = userService.getAllUsers();
 
