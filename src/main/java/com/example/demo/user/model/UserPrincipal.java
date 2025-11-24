@@ -51,4 +51,11 @@ public class UserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean hasRole(String role) {
+        return this.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role.toUpperCase()));
+    }
+
 }

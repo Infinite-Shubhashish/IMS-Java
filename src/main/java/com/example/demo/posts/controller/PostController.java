@@ -91,11 +91,12 @@ public class PostController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllPosts(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
-                                                           @RequestParam(defaultValue = "createdDate") String sortBy) {
+                                                           @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                           @AuthenticationPrincipal UserPrincipal user) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
 
-        Page<PostResponse> postResponses = postService.getPosts(pageable);
+        Page<PostResponse> postResponses = postService.getPosts(user,pageable);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponseBuilder()
                         .status(HttpStatus.OK)

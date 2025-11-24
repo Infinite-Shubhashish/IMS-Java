@@ -47,7 +47,12 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
                         auth .requestMatchers("/auth/register","/auth/login").permitAll()
-                                .requestMatchers("/api/users","/api/roles","api/posts/*/approve","api/posts/*/reject","api/posts/*/close").hasRole("ADMIN")
+                                .requestMatchers("/api/users",
+                                        "/api/users/**",
+                                        "/api/roles",
+                                        "api/posts/*/approve",
+                                        "api/posts/*/reject",
+                                        "api/posts/*/close").hasRole("ADMIN")
                                 .requestMatchers("/api/posts","/api/posts/**").authenticated()
                                 .anyRequest().denyAll()
 

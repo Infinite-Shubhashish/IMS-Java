@@ -38,5 +38,8 @@ public interface PostRepo extends JpaRepository<Post, Long> {
     @Query("SELECT p.type as type, COUNT(p) as count FROM POSTS p where p.creator.username = :username GROUP BY p.type ")
     List<Map<String, Object>> countMyPostsByType(@Param("username") String username);
 
+    @Query("SELECT p FROM POSTS p WHERE p.creator.username = :username OR p.status = 'APPROVED'")
+    Page<Post> findVisiblePosts(String username, Pageable pageable);
+
     long countByCreator_Username(String username);
 }

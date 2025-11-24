@@ -6,6 +6,7 @@ import com.example.demo.posts.model.Post;
 import com.example.demo.posts.model.PostType;
 import com.example.demo.posts.repo.PostRepo;
 import com.example.demo.user.model.User;
+import com.example.demo.user.model.UserPrincipal;
 import com.example.demo.user.repo.UserRepo;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
@@ -103,9 +104,14 @@ public class PostService {
     }
 
     //pagination
-    public Page<PostResponse> getPosts(Pageable pageable) {
-        return postRepo.findAll(pageable)
-                .map(this::mapToResponse);
+    public Page<PostResponse> getPosts(UserPrincipal user, Pageable pageable) {
+       Page<Post> posts;
+       if(user.hasRole("ADMIN")) {
+            posts = postRepo.findAll(pageable);
+       }else{
+           posts = postRepo.findVisiblePosts(user.getUsername(), pageable);
+       }
+       return posts.map(this::mapToResponse);
     }
 
     // for admin
@@ -139,6 +145,7 @@ public class PostService {
             post.setAdminComment(comment);
         }
         post.setStatus(PostStatus.CLOSED);
+
         return mapToResponse(post);
     }
 
