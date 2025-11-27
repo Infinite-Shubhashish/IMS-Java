@@ -42,17 +42,16 @@ public class RegisterController {
         public ResponseEntity<Map<String, Object>> login(@RequestBody User user) throws JsonProcessingException {
             userService.validateUser(user);
             User existingUser = userService.getUserByUsername(user.getUsername());
-            userService.updateLastLoginDate(existingUser.getUsername());
-
-            List<String> roles = existingUser.getRoles()
-            .stream()
-            .map(Role::getRoleName)
-            .toList();
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("username", existingUser.getUsername());
-            data.put("roles", roles);
-
+            
+            if (existingUser.isCredentialsExpired()){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                        new ApiResponseBuilder()
+                                .status(HttpStatus.FORBIDDEN)
+                                .message("Password has expired")
+                                .build()
+                        );
+            }
+            Map<String, Object> data = userService.buildLoginResponse(existingUser);
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ApiResponseBuilder()

@@ -1,6 +1,7 @@
 package com.example.demo.user.service;
 
 import com.example.demo.user.DTOs.UserResponse;
+import com.example.demo.user.DTOs.UserStatusSummary;
 import com.example.demo.user.model.Role;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repo.RoleRepo;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -92,4 +95,36 @@ public class UserService {
 
         return userResponse;
     }
+
+
+    //get User summary
+
+    public UserStatusSummary getUserStatusSummary(){
+        long total = userRepo.count();
+        long active = userRepo.countByIsEnabled(true);
+        long locked = userRepo.countByIsLocked(true);
+        long expired = userRepo.countByIsAccountExpired(true);
+        long credentialsExpired = userRepo.countByIsCredentialsExpired(true);
+
+        return new UserStatusSummary(total, active, locked, expired, credentialsExpired);
+    }
+
+    public Map<String, Object> buildLoginResponse(User user) {
+
+        updateLastLoginDate(user.getUsername());
+
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(Role::getRoleName)
+                .toList();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("username", user.getUsername());
+        data.put("roles", roles);
+
+        return data;
+    }
+
+
+
 }

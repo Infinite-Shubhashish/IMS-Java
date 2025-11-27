@@ -1,7 +1,7 @@
 package com.example.demo.user.controller;
 
 import com.example.demo.user.DTOs.UserResponse;
-import com.example.demo.user.model.User;
+import com.example.demo.user.DTOs.UserStatusSummary;
 import com.example.demo.user.service.UserService;
 import com.example.demo.utils.ApiResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,19 @@ public class UserController {
     public ResponseEntity<Map<String, Long>> countUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(
             Map.of("totalUsers", userService.getTotalUsers())
+        );
+    }
+
+    @GetMapping("users/status-summary")
+    public ResponseEntity<Map<String,Object>> getUserStatusSummary(){
+        UserStatusSummary userStatusSummary = userService.getUserStatusSummary();
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponseBuilder()
+                    .status(HttpStatus.OK)
+                    .message("User status fetched successfully")
+                    .data(userStatusSummary)
+                    .build()
         );
     }
 }
