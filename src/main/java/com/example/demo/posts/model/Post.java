@@ -1,5 +1,6 @@
 package com.example.demo.posts.model;
 
+import com.example.demo.comments.model.Comment;
 import com.example.demo.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity(name = "POSTS")
@@ -39,16 +41,12 @@ public class Post {
     @ToString.Exclude
     private User creator;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "assignee_id")
-//    @ToString.Exclude
-//    private User assignee;
-
     @Column(columnDefinition = "TEXT")
     private String adminComment;
 
     //ADD comment entity later
-
+    @OneToMany(mappedBy = "post", orphanRemoval = true)
+    private List<Comment> comments;
 
     @JsonIgnore
     private LocalDateTime createdDate;

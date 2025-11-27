@@ -33,7 +33,6 @@ public class PostController {
     //create post
     @PostMapping
     public ResponseEntity<Map<String, Object>> post(@Valid @RequestBody PostRequest postRequest, @AuthenticationPrincipal UserPrincipal user) {
-
         PostResponse postResponse = postService.createPost(postRequest, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponseBuilder()
