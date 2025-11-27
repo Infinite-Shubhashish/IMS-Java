@@ -62,15 +62,6 @@ public class User {
     @JsonIgnore
     private LocalDateTime lastLoginDate;
 
-//    public User(){
-//        this.createdDate = LocalDateTime.now();
-//        this.updatedDate = LocalDateTime.now();
-//        this.lastLoginDate = LocalDateTime.now();
-//        this.isAccountExpired = false;
-//        this.isLocked = false;
-//        this.isEnabled = false;
-//        this.isCredentialsExpired = false;
-//    }
 
     @PrePersist
     public void onCreate(){

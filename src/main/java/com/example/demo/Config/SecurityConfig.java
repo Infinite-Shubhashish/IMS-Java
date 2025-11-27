@@ -32,15 +32,6 @@ public class SecurityConfig {
                                                    CustomAccessDeniedHandler customAccessDeniedHandler,
                                                    CustomAuthEntryPoint customAuthEntryPoint) throws Exception{
 
-//        http
-//
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                .requestMatchers("/api/**").authenticated()
-//                .requestMatchers("/auth/register").permitAll()
-//                )
-//                .httpBasic(Customizer.withDefaults())
-//                .formLogin(form -> form.disable());
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -54,6 +45,7 @@ public class SecurityConfig {
                                         "api/posts/*/reject",
                                         "api/posts/*/close").hasRole("ADMIN")
                                 .requestMatchers("/api/posts","/api/posts/**").authenticated()
+                                .requestMatchers("/api/comments/**").hasAnyRole("USER","ADMIN")
                                 .anyRequest().denyAll()
 
                 )

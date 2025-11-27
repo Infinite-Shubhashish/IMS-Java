@@ -20,4 +20,13 @@ public interface UserRepo extends JpaRepository<User,Long> {
     void updateLastLogin(@Param("username") String username,
                          @Param("date") LocalDateTime date);
 
+    long countByIsEnabled(boolean isEnabled);
+
+    long countByIsLocked(boolean isLocked);
+
+    long countByIsAccountExpired(boolean isAccountExpired);
+
+    long countByIsCredentialsExpired(boolean isCredentialsExpired);
+
+
 }
