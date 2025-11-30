@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Repository
@@ -26,7 +27,7 @@ public interface PostRepo extends JpaRepository<Post, Long> {
 
     Page<Post> findByCreator_UsernameAndType(String username, PostType type, Pageable pageable);
 
-    @Query("SELECT p.status as status, COUNT(p) as count FROM POSTS p GROUP BY p.status")
+    @Query("SELECT p.status as status, COUNT(p) as count FROM POSTS p WHERE p.status <> 'DRAFT' GROUP BY p.status")
     List<Map<String, Object>> countPostsByStatus();
 
     @Query("SELECT p.type as type, COUNT(p) as count FROM POSTS p GROUP BY p.type")
@@ -39,7 +40,18 @@ public interface PostRepo extends JpaRepository<Post, Long> {
     List<Map<String, Object>> countMyPostsByType(@Param("username") String username);
 
     @Query("SELECT p FROM POSTS p WHERE p.status = 'APPROVED'")
-    Page<Post> findVisiblePosts(String username, Pageable pageable);
+    Page<Post> findVisiblePosts(Pageable pageable);
+
+    @Query("SELECT p FROM POSTS p WHERE p.status <> 'DRAFT'")
+    Page<Post> findVisiblePostsAdmin(Pageable pageable);
+
+    @Query("SELECT p FROM POSTS p WHERE p.id = :postId AND (p.status = 'APPROVED' OR p.creator.username = :username)")
+    Optional<Post> findVisibleById(@Param("postId") Long postId, @Param("username") String username);
+
+    @Query("SELECT p FROM POSTS p WHERE p.id = :postId AND (p.status <> 'DRAFT')")
+    Optional<Post> findVisibleByIdForAdmin(@Param("postId") Long postId);
 
     long countByCreator_Username(String username);
+
+    long countByStatusNot(PostStatus status);
 }

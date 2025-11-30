@@ -14,6 +14,8 @@ public class PostResponse {
     private PostType postType;
     private PostStatus postStatus;
     private String adminComment;
+    //
+    private int commentCount;
     private Long createdById;
     private String createdByUsername;
     private LocalDateTime createdDate;

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -46,7 +47,7 @@ public class Post {
 
     //ADD comment entity later
     @OneToMany(mappedBy = "post", orphanRemoval = true)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @JsonIgnore
     private LocalDateTime createdDate;
@@ -55,10 +56,12 @@ public class Post {
     @JsonIgnore
     private LocalDateTime closedDate;
 
+
     @PrePersist
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
         this.updatedDate = createdDate;
+
     }
 
     @PreUpdate

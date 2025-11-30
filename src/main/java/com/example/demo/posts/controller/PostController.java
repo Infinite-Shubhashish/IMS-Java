@@ -33,7 +33,7 @@ public class PostController {
     //create post
     @PostMapping
     public ResponseEntity<Map<String, Object>> post(@Valid @RequestBody PostRequest postRequest, @AuthenticationPrincipal UserPrincipal user) {
-        PostResponse postResponse = postService.createPost(postRequest, user.getUsername());
+        PostResponse postResponse = postService.createPost(postRequest, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponseBuilder()
                         .status(HttpStatus.CREATED)
@@ -73,8 +73,8 @@ public class PostController {
 
     //getpost by id
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getPost(@PathVariable Long id) {
-        PostResponse postResponse = postService.getPost(id);
+    public ResponseEntity<Map<String, Object>> getPost(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal user) {
+        PostResponse postResponse = postService.getPost(id, user);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponseBuilder()

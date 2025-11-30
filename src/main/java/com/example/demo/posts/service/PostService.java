@@ -39,8 +39,8 @@ public class PostService {
     private ModelMapper modelMapper;
 
     //Create post
-    public PostResponse createPost(PostRequest postRequest, String username) {
-        User user = userRepo.findByUsername(username);
+    public PostResponse createPost(PostRequest postRequest, UserPrincipal userPrincipal) {
+        User user = userRepo.findByUsername(userPrincipal.getUsername());
 
         if (user == null) {
             throw new EntityNotFoundException("User not found");
@@ -48,6 +48,13 @@ public class PostService {
 
         Post post = modelMapper.map(postRequest, Post.class);
         post.setCreator(user);
+
+        if (userPrincipal.hasRole("ADMIN")) {
+            post.setStatus(PostStatus.APPROVED);
+        } else {
+            post.setStatus(PostStatus.DRAFT);
+        }
+
 
         Post saved = postRepo.save(post);
 
@@ -97,9 +104,15 @@ public class PostService {
     }
 
     //post by Id
-    public PostResponse getPost(Long id) {
-        Post post = postRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+    public PostResponse getPost(Long id, UserPrincipal user) {
+        Post post;
+        if (user.hasRole("ADMIN")) {
+            post = postRepo.findVisibleByIdForAdmin(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Post not found or access denied"));
+        } else {
+            post = postRepo.findVisibleById(id, user.getUsername())
+                    .orElseThrow(() -> new EntityNotFoundException("Post not found or access denied"));
+        }
         return mapToResponse(post);
     }
 
@@ -107,9 +120,9 @@ public class PostService {
     public Page<PostResponse> getPosts(UserPrincipal user, Pageable pageable) {
        Page<Post> posts;
        if(user.hasRole("ADMIN")) {
-            posts = postRepo.findAll(pageable);
+            posts = postRepo.findVisiblePostsAdmin(pageable);
        }else{
-           posts = postRepo.findVisiblePosts(user.getUsername(), pageable);
+           posts = postRepo.findVisiblePosts(pageable);
        }
        return posts.map(this::mapToResponse);
     }
@@ -166,6 +179,7 @@ public class PostService {
         PostResponse postResponse = modelMapper.map(post, PostResponse.class);
         postResponse.setCreatedById(post.getCreator().getId());
         postResponse.setCreatedByUsername(post.getCreator().getUsername());
+        postResponse.setCommentCount(post.getComments().size());
 
         return postResponse;
     }
@@ -254,7 +268,7 @@ public class PostService {
 
     //Total posts
     public long getTotalPosts(){
-        return postRepo.count();
+        return postRepo.countByStatusNot(PostStatus.DRAFT);
     }
 
     public long getMyTotalPosts(String username){
