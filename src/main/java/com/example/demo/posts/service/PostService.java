@@ -8,7 +8,6 @@ import com.example.demo.posts.repo.PostRepo;
 import com.example.demo.user.model.User;
 import com.example.demo.user.model.UserPrincipal;
 import com.example.demo.user.repo.UserRepo;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import com.example.demo.posts.model.PostStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +102,7 @@ public class PostService {
         return mapToResponse(post);
     }
 
-    //post by Id
+    //post by id
     public PostResponse getPost(Long id, UserPrincipal user) {
         Post post;
         if (user.hasRole("ADMIN")) {

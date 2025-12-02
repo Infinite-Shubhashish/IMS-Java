@@ -2,6 +2,7 @@ package com.example.demo.Config;
 
 import com.example.demo.exceptions.CustomAccessDeniedHandler;
 import com.example.demo.exceptions.CustomAuthEntryPoint;
+import com.example.demo.jwt.config.JWTFilter;
 import com.example.demo.user.service.CustomUserDetailService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,10 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,6 +28,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private JWTFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -49,9 +55,14 @@ public class SecurityConfig {
                                 .anyRequest().denyAll()
 
                 )
+              //  .httpBasic(httpBasic -> httpBasic.disable());
+
                 .httpBasic(Customizer.withDefaults())
-                .authenticationProvider(authenticationProvider)
-                .exceptionHandling(ex -> ex
+                .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+                http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                http.exceptionHandling(ex -> ex
                         .accessDeniedHandler(customAccessDeniedHandler)
                         .authenticationEntryPoint(customAuthEntryPoint));
 

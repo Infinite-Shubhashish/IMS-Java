@@ -1,11 +1,14 @@
 package com.example.demo.user.service;
 
+import com.example.demo.jwt.service.JwtService;
+import com.example.demo.user.DTOs.UserRequest;
 import com.example.demo.user.DTOs.UserResponse;
 import com.example.demo.user.DTOs.UserStatusSummary;
 import com.example.demo.user.model.Role;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repo.RoleRepo;
 import com.example.demo.user.repo.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -39,6 +39,9 @@ public class UserService {
     @Autowired
     private RoleRepo roleRepo;
 
+    @Autowired
+    private JwtService jwtService;
+
     public void registerUser(@RequestBody User user) {
         List<Role> roles = new ArrayList<>();
 
@@ -54,10 +57,6 @@ public class UserService {
         userRepo.save(user);
     }
 
-    // public List<User> getAllUsers() {
-    //     return userRepo.findAll();
-    // }
-
     //Pagination for users
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         Page<User> users = userRepo.findAll(pageable);
@@ -65,8 +64,37 @@ public class UserService {
         return users.map(this::mapToResponse);
     }
 
-    public void validateUser(User user) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+    public Map<String, Object> validateUser(UserRequest userRequest) {
+        Map<String, Object> map = new HashMap<>();
+
+        User user = userRepo.findByUsername(userRequest.getUsername());
+
+        if(user == null){
+            throw new EntityNotFoundException("Invalid Username");
+        }
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userRequest.getUsername(),
+                        userRequest.getPassword()
+                )
+        );
+
+        updateLastLoginDate(user.getUsername());
+
+        String token = jwtService.generateToken(user.getUsername());
+        Date date = jwtService.extractExpiration(token);
+        map.put("token", token);
+        map.put("expiration", date);
+
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(Role::getRoleName)
+                .toList();
+
+        map.put("roles", roles);
+
+        return map;
     }
 
     public User getUserByUsername(@Length(min = 4, max = 40) String username) {
@@ -124,7 +152,4 @@ public class UserService {
 
         return data;
     }
-
-
-
 }

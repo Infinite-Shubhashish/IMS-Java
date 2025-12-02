@@ -14,8 +14,4 @@ public class UserResponse {
     private String email;
     private String contact;
     private List<Role> roles;
-//    private boolean credentialsExpired;
-//    private boolean accountExpired;
-//    private boolean locked;
-//    private boolean enabled;
 }

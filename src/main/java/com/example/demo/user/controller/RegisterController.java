@@ -1,5 +1,6 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.user.DTOs.UserRequest;
 import com.example.demo.user.model.User;
 import com.example.demo.user.model.Role;
 import com.example.demo.user.service.UserService;
@@ -39,25 +40,15 @@ public class RegisterController {
         }
 
         @PostMapping(value="/login")
-        public ResponseEntity<Map<String, Object>> login(@RequestBody User user) throws JsonProcessingException {
-            userService.validateUser(user);
-            User existingUser = userService.getUserByUsername(user.getUsername());
-            
-            if (existingUser.isCredentialsExpired()){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                        new ApiResponseBuilder()
-                                .status(HttpStatus.FORBIDDEN)
-                                .message("Password has expired")
-                                .build()
-                        );
-            }
-            Map<String, Object> data = userService.buildLoginResponse(existingUser);
+        public ResponseEntity<Map<String, Object>> login(@RequestBody UserRequest userRequest) throws JsonProcessingException {
+
+            Map<String, Object> token = userService.validateUser(userRequest);
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ApiResponseBuilder()
                             .status(HttpStatus.OK)
                             .message("User logged in successfully")
-                            .data(data)
+                            .data(token)
                             .build()
             );
         }

@@ -2,7 +2,6 @@ package com.example.demo.comments.controller;
 
 import com.example.demo.comments.DTOs.CommentRequest;
 import com.example.demo.comments.DTOs.CommentResponse;
-import com.example.demo.comments.model.Comment;
 import com.example.demo.comments.service.CommentService;
 import com.example.demo.user.model.UserPrincipal;
 import com.example.demo.utils.ApiResponseBuilder;
